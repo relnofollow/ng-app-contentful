@@ -1,0 +1,23 @@
+<div class="mx-auto max-w-screen-md bg-white">
+  <nav mat-tab-nav-bar [tabPanel]="tabPanel">
+    <a
+      mat-tab-link
+      routerLink="content-types"
+      routerLinkActive
+      #rla1="routerLinkActive"
+      [active]="rla1.isActive"
+      >Content Types</a
+    >
+    <a
+      mat-tab-link
+      routerLink="entries"
+      routerLinkActive
+      #rla2="routerLinkActive"
+      [active]="rla2.isActive"
+      >Entries</a
+    >
+  </nav>
+  <mat-tab-nav-panel #tabPanel class="block px-2 py-4">
+    <router-outlet></router-outlet>
+  </mat-tab-nav-panel>
+</div>

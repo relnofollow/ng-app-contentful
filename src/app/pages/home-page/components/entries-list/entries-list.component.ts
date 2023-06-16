@@ -23,6 +23,7 @@ import { ContentType, EntryCollection } from 'contentful';
 import { indicate } from 'src/app/helpers/rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { PagingParameters } from 'src/app/models/PagingParameters';
+import { Sort, SortDirection } from '@angular/material/sort';
 
 @Component({
   selector: 'app-entries-list',
@@ -32,15 +33,18 @@ import { PagingParameters } from 'src/app/models/PagingParameters';
 export class EntriesListComponent {
   public entries: any[] | null = null;
 
+  public INITIAL_SORT_DIRECTION = <SortDirection>'desc'; // const
   public totalEntriesLength: number | undefined;
   public pageSize = 5;
   public pageIndex = 0;
 
   public loading$ = new Subject<boolean>();
-  public contentTypes$!: Observable<ContentType[]>;
-  public pagingParameters$ = new Subject<PagingParameters>();
+  private contentTypes$!: Observable<ContentType[]>;
+  private pagingParameters$ = new Subject<PagingParameters>();
+  private sortDirection$ = new Subject<SortDirection>();
+  public sortDirection = this.INITIAL_SORT_DIRECTION;
 
-  public columnsToDisplay = ['title', 'contentType'];
+  public columnsToDisplay = ['title', 'contentType', 'updatedAt'];
 
   public showDraftControl = new FormControl<boolean>(false, {
     nonNullable: true,
@@ -53,6 +57,7 @@ export class EntriesListComponent {
     combineLatest([
       this.getTitleFilterObservable(),
       this.getPagingParametersObservable(),
+      this.getSortDirectionObservable(),
       this.getIsDraftObservable(),
     ])
       .pipe(
@@ -83,6 +88,11 @@ export class EntriesListComponent {
     this.pagingParameters$.next({ pageSize, pageIndex });
   }
 
+  public onSortChange(event: Sort): void {
+    this.sortDirection = event.direction;
+    this.sortDirection$.next(event.direction);
+  }
+
   private getTitleFilterObservable(): Observable<string> {
     return this.searchByTitleControl.valueChanges.pipe(
       startWith(this.searchByTitleControl.value),
@@ -101,6 +111,13 @@ export class EntriesListComponent {
     );
   }
 
+  private getSortDirectionObservable(): Observable<SortDirection> {
+    return this.sortDirection$.pipe(
+      startWith(this.INITIAL_SORT_DIRECTION),
+      tap(() => this.resetPageIndex())
+    );
+  }
+
   private getIsDraftObservable(): Observable<boolean> {
     return this.showDraftControl.valueChanges.pipe(
       startWith(this.showDraftControl.value),
@@ -116,6 +133,7 @@ export class EntriesListComponent {
         pageIndex: this.pageIndex,
         pageSize: this.pageSize,
       },
+      order: this.sortDirection,
     };
   }
 

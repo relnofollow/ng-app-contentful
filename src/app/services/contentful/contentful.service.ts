@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SortDirection } from '@angular/material/sort';
 import { ContentTypeCollection, ContentType, createClient } from 'contentful';
 import { PagingParameters } from 'src/app/models/PagingParameters';
 
@@ -16,6 +17,7 @@ export type ContentfulEntriesQuery = {
   isDraft: boolean;
   titleFilter?: string;
   pagingParameters?: PagingParameters;
+  order: SortDirection;
 };
 
 @Injectable({
@@ -47,6 +49,7 @@ export class ContentfulService {
     isDraft = false,
     titleFilter,
     pagingParameters,
+    order,
   }: ContentfulEntriesQuery) {
     const client = isDraft ? this.cpaClient : this.cdaClient;
     const query = {};
@@ -66,6 +69,10 @@ export class ContentfulService {
         limit: pageSize,
       });
     }
+
+    Object.assign(query, {
+      order: `${order === 'desc' ? '-' : ''}sys.updatedAt`,
+    });
 
     return client.getEntries(query);
   }

@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ContentTypesListComponent } from './components/content-types-list/content-types-list.component';
@@ -35,6 +36,7 @@ import { RouterModule } from '@angular/router';
     MatInputModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
+    MatSortModule,
     MatTableModule,
     MatTabsModule,
     ReactiveFormsModule,

@@ -1,1 +1,51 @@
-<p>entries-list works!</p>
+<div class="mx-4 flex items-center justify-between py-2 text-sm">
+  <div class="flex w-1/2 items-center font-light">
+    <mat-form-field subscriptSizing="dynamic" class="flex-grow">
+      <mat-label>Search by product title</mat-label>
+      <input matInput type="search" [formControl]="searchByTitleControl" />
+    </mat-form-field>
+  </div>
+  <mat-checkbox [formControl]="showDraftControl"
+    >Show draft entries</mat-checkbox
+  >
+</div>
+<div>
+  <div *ngIf="(loading$ | async) || !entries; else entriesContainer">
+    <div class="flex h-72 w-full items-center justify-center">
+      <mat-spinner></mat-spinner>
+    </div>
+  </div>
+  <ng-template #entriesContainer>
+    <div *ngIf="entries!.length; else noEntries">
+      <table mat-table [dataSource]="entries!">
+        <!--Title column -->
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let entry">{{ entry.fields.title }}</td>
+        </ng-container>
+
+        <!-- Content type column -->
+        <ng-container matColumnDef="contentType">
+          <th mat-header-cell *matHeaderCellDef>Content Type</th>
+          <td mat-cell *matCellDef="let entry">{{ entry.contentType.name }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+      </table>
+      <mat-paginator
+        (page)="onPaginatorChange($event)"
+        [length]="totalEntriesLength"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        aria-label="Select page"
+      >
+      </mat-paginator>
+    </div>
+
+    <ng-template #noEntries>
+      <div class="m-4">No entries</div>
+    </ng-template>
+  </ng-template>
+</div>

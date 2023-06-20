@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
-import { ContentTypeCollection, ContentType, createClient } from 'contentful';
+import {
+  ContentfulClientApi,
+  ContentTypeCollection,
+  ContentType,
+  createClient,
+  Entry,
+} from 'contentful';
 import { PagingParameters } from 'src/app/models/PagingParameters';
 
 const CONFIG = {
@@ -51,7 +57,7 @@ export class ContentfulService {
     pagingParameters,
     order,
   }: ContentfulEntriesQuery) {
-    const client = isDraft ? this.cpaClient : this.cdaClient;
+    const client = this.getClient(isDraft);
     const query = {};
 
     if (titleFilter) {
@@ -75,5 +81,15 @@ export class ContentfulService {
     });
 
     return client.getEntries(query);
+  }
+
+  public getEntry(entryId: string, isDraft: boolean): Promise<Entry> {
+    const client = this.getClient(isDraft);
+
+    return client.getEntry(entryId);
+  }
+
+  private getClient(isCPA: boolean): ContentfulClientApi<undefined> {
+    return isCPA ? this.cpaClient : this.cdaClient;
   }
 }

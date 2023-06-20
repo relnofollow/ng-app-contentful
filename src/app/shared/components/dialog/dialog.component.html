@@ -1,0 +1,21 @@
+<div class="flex h-full flex-col">
+  <!-- Title -->
+  <div mat-dialog-title class="!pr-[9px]">
+    <div class="inline-flex w-full items-center justify-between">
+      <h2 class="overflow-hidden">{{ title }}</h2>
+      <button mat-icon-button mat-dialog-close color="primary">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <!-- Body -->
+  <mat-dialog-content class="flex-grow-1 flex-shrink-1">
+    <ng-content></ng-content>
+  </mat-dialog-content>
+  <!-- Footer -->
+  <mat-dialog-actions class="!block !py-4 text-center">
+    <button mat-button mat-raised-button mat-dialog-close color="primary">
+      Close
+    </button>
+  </mat-dialog-actions>
+</div>

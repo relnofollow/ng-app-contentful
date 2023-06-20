@@ -15,9 +15,13 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ContentTypesListComponent } from './components/content-types-list/content-types-list.component';
 import { EntriesListComponent } from './components/entries-list/entries-list.component';
-import { ContentTypeJsonComponent } from './components/content-type-json/content-type-json.component';
+import { ContentTypeJsonComponent } from './dialogs/content-type-json/content-type-json.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { EditEntryComponent } from './dialogs/edit-entry/edit-entry.component';
+import { ViewEntryComponent } from './dialogs/view-entry/view-entry.component';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { ContentfulFieldComponent } from './components/contentful-field/contentful-field.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +29,9 @@ import { RouterModule } from '@angular/router';
     ContentTypesListComponent,
     EntriesListComponent,
     ContentTypeJsonComponent,
+    EditEntryComponent,
+    ViewEntryComponent,
+    ContentfulFieldComponent,
   ],
   imports: [
     CommonModule,
@@ -41,6 +48,7 @@ import { RouterModule } from '@angular/router';
     MatTabsModule,
     ReactiveFormsModule,
     RouterModule.forChild([]),
+    SharedModule,
   ],
 })
 export class HomePageModule {}

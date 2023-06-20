@@ -1,0 +1,8 @@
+<app-dialog [title]="'Content Type: ' + data.contentTypeName">
+  <mat-form-field subscriptSizing="dynamic" class="h-full w-full">
+    <mat-label>JSON</mat-label>
+    <textarea matInput class="!resize-none !text-sm" readonly rows="10">{{
+      this.contentType | json
+    }}</textarea>
+  </mat-form-field>
+</app-dialog>

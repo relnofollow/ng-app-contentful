@@ -1,0 +1,61 @@
+<ng-container
+  *ngTemplateOutlet="
+    fieldValueTemplate;
+    context: {
+      fieldValue,
+      contentTypeField
+    }
+  "
+>
+</ng-container>
+
+<ng-template
+  #fieldValueTemplate
+  let-fieldValue="fieldValue"
+  let-contentTypeField="contentTypeField"
+>
+  <ng-container [ngSwitch]="contentTypeField.type">
+    <span *ngSwitchCase="'RichText'" [innerHTML]="richText"></span>
+
+    <ng-container
+      *ngSwitchCase="
+        contentTypeField.type === 'Link' &&
+        contentTypeField.linkType === 'Asset'
+          ? contentTypeField.type
+          : ''
+      "
+    >
+      <img [src]="fieldValue.fields['file'].url" />
+    </ng-container>
+
+    <ng-container
+      *ngSwitchCase="
+        contentTypeField.type === 'Link' &&
+        contentTypeField.linkType === 'Entry'
+          ? contentTypeField.type
+          : ''
+      "
+    >
+      [Link] {{ fieldValue.fields["title"] }}
+    </ng-container>
+
+    <ng-container *ngSwitchCase="'Array'">
+      <ng-container *ngFor="let item of fieldValue">
+        <ng-container
+          *ngTemplateOutlet="
+            fieldValueTemplate;
+            context: {
+              fieldValue: item,
+              contentTypeField: contentTypeField.items
+            }
+          "
+        ></ng-container>
+        <br />
+      </ng-container>
+    </ng-container>
+
+    <ng-container *ngSwitchDefault>
+      {{ fieldValue }}
+    </ng-container>
+  </ng-container>
+</ng-template>

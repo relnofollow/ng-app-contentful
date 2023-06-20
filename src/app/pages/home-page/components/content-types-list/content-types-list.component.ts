@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ContentfulService } from 'src/app/services/contentful/contentful.service';
 import { ContentType } from 'contentful';
 import { MatDialog } from '@angular/material/dialog';
-import { ContentTypeJsonComponent } from '../content-type-json/content-type-json.component';
+import { ContentTypeJsonComponent } from '../../dialogs/content-type-json/content-type-json.component';
 
 @Component({
   selector: 'app-content-types-list',

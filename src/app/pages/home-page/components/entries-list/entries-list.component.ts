@@ -19,11 +19,14 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { ContentType, EntryCollection } from 'contentful';
+import { ContentType, EntryCollection, Entry } from 'contentful';
 import { indicate } from 'src/app/helpers/rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { PagingParameters } from 'src/app/models/PagingParameters';
 import { Sort, SortDirection } from '@angular/material/sort';
+import { MatDialog } from '@angular/material/dialog';
+import { EditEntryComponent } from '../../dialogs/edit-entry/edit-entry.component';
+import { ViewEntryComponent } from '../../dialogs/view-entry/view-entry.component';
 
 @Component({
   selector: 'app-entries-list',
@@ -44,7 +47,13 @@ export class EntriesListComponent {
   private sortDirection$ = new Subject<SortDirection>();
   public sortDirection = this.INITIAL_SORT_DIRECTION;
 
-  public columnsToDisplay = ['title', 'contentType', 'updatedAt'];
+  public columnsToDisplay = [
+    'title',
+    'viewDetails',
+    'contentType',
+    'updatedAt',
+    'edit',
+  ];
 
   public showDraftControl = new FormControl<boolean>(false, {
     nonNullable: true,
@@ -53,7 +62,10 @@ export class EntriesListComponent {
     nonNullable: true,
   });
 
-  constructor(private contentfulService: ContentfulService) {
+  constructor(
+    private contentfulService: ContentfulService,
+    private dialog: MatDialog
+  ) {
     combineLatest([
       this.getTitleFilterObservable(),
       this.getPagingParametersObservable(),
@@ -88,7 +100,32 @@ export class EntriesListComponent {
     this.pagingParameters$.next({ pageSize, pageIndex });
   }
 
+  public onViewEntryClick(entry: Entry): void {
+    this.dialog.open(ViewEntryComponent, {
+      autoFocus: false,
+      height: '400px',
+      width: '600px',
+      data: {
+        entryTitle: entry.fields['title'],
+        entryId: entry.sys.id,
+        contentTypeId: entry.sys.contentType.sys.id,
+        isDraft: this.showDraftControl.value,
+      },
+    });
+  }
+
+  public onEditEntryClick(entry: any): void {
+    this.dialog.open(EditEntryComponent, {
+      autoFocus: false,
+      height: '400px',
+      width: '600px',
+    });
+  }
+
   public onSortChange(event: Sort): void {
+    // TODO: fix sorting arrow animation
+    // for some reason the table header is re-rendered after sorting and
+    // it blinks instead of animation
     this.sortDirection = event.direction;
     this.sortDirection$.next(event.direction);
   }

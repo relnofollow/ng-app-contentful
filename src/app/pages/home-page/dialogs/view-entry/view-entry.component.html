@@ -1,0 +1,23 @@
+<app-dialog [title]="'Entry: ' + data.entryTitle">
+  <div
+    class="flex h-full items-center justify-center"
+    *ngIf="isLoading || !fieldAndTypePairs; else entryData"
+  >
+    <mat-spinner></mat-spinner>
+  </div>
+  <ng-template #entryData>
+    <dl class="grid grid-cols-[min-content_auto] gap-y-[1px]">
+      <ng-container *ngFor="let fieldAndType of fieldAndTypePairs">
+        <dt class="whitespace-nowrap bg-gray-200 p-4 font-medium">
+          {{ fieldAndType[1].name }}
+        </dt>
+        <dd class="p-4">
+          <app-contentful-field
+            [fieldValue]="fieldAndType[0]"
+            [contentTypeField]="fieldAndType[1]"
+          ></app-contentful-field>
+        </dd>
+      </ng-container>
+    </dl>
+  </ng-template>
+</app-dialog>

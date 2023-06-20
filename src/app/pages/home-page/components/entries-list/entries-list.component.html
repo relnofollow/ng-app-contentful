@@ -18,6 +18,7 @@
   <ng-template #entriesContainer>
     <div *ngIf="entries!.length; else noEntries">
       <table
+        class="mb-4 mt-2"
         mat-table
         matSort
         matSortActive="updatedAt"
@@ -29,7 +30,24 @@
         <!--Title column -->
         <ng-container matColumnDef="title">
           <th mat-header-cell *matHeaderCellDef>Title</th>
-          <td mat-cell *matCellDef="let entry">{{ entry.fields.title }}</td>
+          <td mat-cell *matCellDef="let entry">
+            {{ entry.fields.title }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="viewDetails">
+          <th mat-header-cell *matHeaderCellDef>Details</th>
+          <td mat-cell *matCellDef="let entry">
+            <button
+              mat-icon-button
+              aria-label="View"
+              class="mr-2"
+              color="primary"
+              (click)="onViewEntryClick(entry)"
+            >
+              <mat-icon>wysiwyg</mat-icon>
+            </button>
+          </td>
         </ng-container>
 
         <!-- Content type column -->
@@ -45,6 +63,21 @@
           </th>
           <td mat-cell *matCellDef="let entry">
             {{ entry.sys.updatedAt | date : "medium" }}
+          </td>
+        </ng-container>
+
+        <!-- Edit button column -->
+        <ng-container matColumnDef="edit">
+          <th mat-header-cell *matHeaderCellDef>Edit</th>
+          <td mat-cell *matCellDef="let entry">
+            <button
+              mat-raised-button
+              color="primary"
+              *ngIf="entry.contentType.sys.id === 'category'"
+              (click)="onEditEntryClick(entry)"
+            >
+              Edit
+            </button>
           </td>
         </ng-container>
 

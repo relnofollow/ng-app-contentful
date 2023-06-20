@@ -21,6 +21,7 @@ const CONFIG = {
 
 export type ContentfulEntriesQuery = {
   isDraft: boolean;
+  contentTypeId: string | null;
   titleFilter?: string;
   pagingParameters?: PagingParameters;
   order: SortDirection;
@@ -53,6 +54,7 @@ export class ContentfulService {
 
   public async getEntries({
     isDraft = false,
+    contentTypeId,
     titleFilter,
     pagingParameters,
     order,
@@ -60,11 +62,16 @@ export class ContentfulService {
     const client = this.getClient(isDraft);
     const query = {};
 
-    if (titleFilter) {
+    if (contentTypeId) {
       Object.assign(query, {
-        content_type: 'product',
-        'fields.title[match]': titleFilter,
+        content_type: contentTypeId,
       });
+
+      if (titleFilter) {
+        Object.assign(query, {
+          'fields.title[match]': titleFilter,
+        });
+      }
     }
 
     if (pagingParameters) {

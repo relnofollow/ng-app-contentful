@@ -42,15 +42,15 @@ export class EntriesListComponent {
   public pageIndex = 0;
 
   public loading$ = new Subject<boolean>();
-  private contentTypes$!: Observable<ContentType[]>;
+  public contentTypes$!: Observable<ContentType[]>;
   private pagingParameters$ = new Subject<PagingParameters>();
   private sortDirection$ = new Subject<SortDirection>();
   public sortDirection = this.INITIAL_SORT_DIRECTION;
 
   public columnsToDisplay = [
+    'contentType',
     'title',
     'viewDetails',
-    'contentType',
     'updatedAt',
     'edit',
   ];
@@ -61,12 +61,14 @@ export class EntriesListComponent {
   public searchByTitleControl = new FormControl<string>('', {
     nonNullable: true,
   });
+  public contentTypeControl = new FormControl<string | null>(null);
 
   constructor(
     private contentfulService: ContentfulService,
     private dialog: MatDialog
   ) {
     combineLatest([
+      this.getContentTypeObservable(),
       this.getTitleFilterObservable(),
       this.getPagingParametersObservable(),
       this.getSortDirectionObservable(),
@@ -86,7 +88,11 @@ export class EntriesListComponent {
 
     this.contentTypes$ = from(this.contentfulService.getContentTypes()).pipe(
       takeUntilDestroyed(),
-      map((response) => response.items),
+      map((response) =>
+        response.items.sort((item1, item2) =>
+          item1.name.localeCompare(item2.name)
+        )
+      ),
       shareReplay(1)
     );
   }
@@ -130,6 +136,17 @@ export class EntriesListComponent {
     this.sortDirection$.next(event.direction);
   }
 
+  private getContentTypeObservable(): Observable<string | null> {
+    return this.contentTypeControl.valueChanges.pipe(
+      startWith(null),
+      distinctUntilChanged(),
+      tap(() => this.resetPageIndex()),
+      tap((value) => {
+        if (!value) this.resetTitleFilter();
+      })
+    );
+  }
+
   private getTitleFilterObservable(): Observable<string> {
     return this.searchByTitleControl.valueChanges.pipe(
       startWith(this.searchByTitleControl.value),
@@ -165,6 +182,7 @@ export class EntriesListComponent {
   private getQueryParameters(): ContentfulEntriesQuery {
     return {
       isDraft: this.showDraftControl.value,
+      contentTypeId: this.contentTypeControl.value,
       titleFilter: this.searchByTitleControl.value,
       pagingParameters: {
         pageIndex: this.pageIndex,
@@ -189,5 +207,9 @@ export class EntriesListComponent {
 
   private resetPageIndex(): void {
     this.pageIndex = 0;
+  }
+
+  private resetTitleFilter(): void {
+    this.searchByTitleControl.setValue('');
   }
 }

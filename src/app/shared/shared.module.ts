@@ -4,13 +4,14 @@ import { DialogComponent } from './components/dialog/dialog.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 const sharedComponents = [DialogComponent];
 const sharedDirectives = [UnlessDirective];
 
 @NgModule({
   declarations: [...sharedComponents, ...sharedDirectives],
-  imports: [MatButtonModule, MatDialogModule, MatIconModule],
+  imports: [CommonModule, MatButtonModule, MatDialogModule, MatIconModule],
   exports: [...sharedComponents, ...sharedDirectives],
 })
 export class SharedModule {}

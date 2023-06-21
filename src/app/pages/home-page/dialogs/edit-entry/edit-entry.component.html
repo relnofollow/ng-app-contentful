@@ -1,1 +1,62 @@
-<app-dialog title="Edit entry"> TBA </app-dialog>
+<app-dialog title="Edit entry" [formGroup]="entryForm">
+  <mat-form-field class="w-full">
+    <mat-label>Title</mat-label>
+    <input matInput formControlName="title" />
+  </mat-form-field>
+  <mat-form-field class="w-full">
+    <mat-label>Description</mat-label>
+    <input matInput formControlName="description" />
+  </mat-form-field>
+  <div>
+    <label for="image" class="mb-4 block">Image</label>
+    <ng-container *ngIf="imageUrl; else uploadImage">
+      <div class="mb-2 block">
+        <img [src]="imageUrl" class="max-h-60" />
+      </div>
+      <button mat-button mat-stroked-button (click)="onChangeImageClick()">
+        Change
+      </button>
+    </ng-container>
+    <ng-template #uploadImage>
+      <input
+        id="image"
+        type="file"
+        class="hidden"
+        (change)="onFileSelected($event)"
+        #uploadFile
+      />
+
+      <button
+        color="primary"
+        mat-stroked-button
+        (click)="uploadFile.click()"
+        class="mr-2"
+      >
+        <mat-icon>add</mat-icon> Select file
+      </button>
+      No file selected
+    </ng-template>
+  </div>
+  <ng-template #dialogFooter>
+    <button mat-button mat-raised-button mat-dialog-close class="mr-4">
+      Cancel
+    </button>
+    <button
+      mat-button
+      mat-raised-button
+      color="primary"
+      (click)="onSaveEntryClick(false)"
+      class="mr-4"
+    >
+      Save
+    </button>
+    <button
+      mat-button
+      mat-raised-button
+      color="accent"
+      (click)="onSaveEntryClick(true)"
+    >
+      Save & Publish
+    </button></ng-template
+  >
+</app-dialog>

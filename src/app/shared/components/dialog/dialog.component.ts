@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ContentChild, Input, TemplateRef } from '@angular/core';
 
 @Component({
   selector: 'app-dialog',
@@ -6,5 +6,7 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./dialog.component.scss'],
 })
 export class DialogComponent {
+  @ContentChild('dialogFooter') dialogFooter: TemplateRef<unknown> | undefined;
+
   @Input() title: string | undefined;
 }

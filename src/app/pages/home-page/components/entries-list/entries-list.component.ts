@@ -125,6 +125,9 @@ export class EntriesListComponent {
       autoFocus: false,
       height: '400px',
       width: '600px',
+      data: {
+        entry,
+      },
     });
   }
 

@@ -14,8 +14,14 @@
   </mat-dialog-content>
   <!-- Footer -->
   <mat-dialog-actions class="!block !py-4 text-center">
-    <button mat-button mat-raised-button mat-dialog-close color="primary">
-      Close
-    </button>
+    <ng-container *ngIf="!dialogFooter; else dialogFooterTemplate">
+      <button mat-button mat-raised-button mat-dialog-close color="primary">
+        Close
+      </button>
+    </ng-container>
+
+    <ng-template #dialogFooterTemplate>
+      <ng-container *ngTemplateOutlet="dialogFooter!"></ng-container>
+    </ng-template>
   </mat-dialog-actions>
 </div>

@@ -1,7 +1,10 @@
-<app-dialog title="Edit entry" [formGroup]="entryForm" [showLoader]="isLoading">
+<app-dialog [title]="title" [formGroup]="entryForm" [showLoader]="isLoading">
   <mat-form-field class="w-full">
     <mat-label>Title</mat-label>
     <input matInput formControlName="title" />
+    <mat-error *ngIf="entryForm.get('title')!.invalid">
+      Required field</mat-error
+    >
   </mat-form-field>
   <mat-form-field class="w-full">
     <mat-label>Description</mat-label>
@@ -45,6 +48,7 @@
       mat-button
       mat-raised-button
       color="primary"
+      [disabled]="entryForm.invalid"
       (click)="onSaveEntryClick(false)"
       class="mr-4"
     >
@@ -54,6 +58,7 @@
       mat-button
       mat-raised-button
       color="accent"
+      [disabled]="entryForm.invalid"
       (click)="onSaveEntryClick(true)"
     >
       Save & Publish

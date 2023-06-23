@@ -100,15 +100,24 @@
         <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
         <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
       </table>
-      <mat-paginator
-        (page)="onPaginatorChange($event)"
-        [length]="totalEntriesLength"
-        [pageIndex]="pageIndex"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 25, 100]"
-        aria-label="Select page"
-      >
-      </mat-paginator>
+      <div class="flex justify-between">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onAddNewCategoryClick()"
+        >
+          <mat-icon>add</mat-icon> Add new category
+        </button>
+        <mat-paginator
+          (page)="onPaginatorChange($event)"
+          [length]="totalEntriesLength"
+          [pageIndex]="pageIndex"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          aria-label="Select page"
+        >
+        </mat-paginator>
+      </div>
     </div>
 
     <ng-template #noEntries>

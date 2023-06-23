@@ -127,6 +127,22 @@ export class EntriesListComponent implements OnInit {
   }
 
   public onEditEntryClick(entry: any): void {
+    this.openEditEntryDialog(entry);
+  }
+
+  public onSortChange(event: Sort): void {
+    // TODO: fix sorting arrow animation
+    // for some reason the table header is re-rendered after sorting and
+    // it blinks instead of animation
+    this.sortDirection = event.direction;
+    this.sortDirection$.next(event.direction);
+  }
+
+  public onAddNewCategoryClick(): void {
+    this.openEditEntryDialog();
+  }
+
+  private openEditEntryDialog(entry?: any) {
     const dialogRef = this.dialog.open(EditEntryComponent, {
       autoFocus: false,
       height: '400px',
@@ -141,14 +157,6 @@ export class EntriesListComponent implements OnInit {
         this.reloadEntries();
       }
     });
-  }
-
-  public onSortChange(event: Sort): void {
-    // TODO: fix sorting arrow animation
-    // for some reason the table header is re-rendered after sorting and
-    // it blinks instead of animation
-    this.sortDirection = event.direction;
-    this.sortDirection$.next(event.direction);
   }
 
   private getContentTypeObservable(): Observable<string | null> {

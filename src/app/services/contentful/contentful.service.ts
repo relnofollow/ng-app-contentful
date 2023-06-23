@@ -121,13 +121,7 @@ export class ContentfulService {
   ) {
     let managementEntry = await this.cmaClient.entry.get({ entryId });
 
-    for (let fieldName of ['title', 'description', 'image']) {
-      this.addManagementEntryField(
-        managementEntry,
-        fieldName,
-        entryFields[fieldName]
-      );
-    }
+    this.updateManagementEntryFields(managementEntry, entryFields);
 
     managementEntry = await this.cmaClient.entry.update(
       {
@@ -137,17 +131,27 @@ export class ContentfulService {
     );
 
     if (isPublish) {
-      managementEntry = await this.cmaClient.entry.publish(
-        { entryId },
-        managementEntry
-      );
+      managementEntry = await this.publishEntry(managementEntry);
+    }
+  }
 
-      // Cascade publish for image asset
-      if (managementEntry.fields['image']) {
-        await this.publishAsset(
-          managementEntry.fields['image']['en-US'].sys.id
-        );
-      }
+  public async addCategoryEntry(
+    entryFields: Record<string, any>,
+    isPublish = false
+  ) {
+    let managementEntry = <EntryProps<KeyValueMap>>{ fields: {} };
+
+    this.updateManagementEntryFields(managementEntry, entryFields);
+
+    managementEntry = await this.cmaClient.entry.create(
+      {
+        contentTypeId: 'category',
+      },
+      managementEntry
+    );
+
+    if (isPublish) {
+      managementEntry = await this.publishEntry(managementEntry);
     }
   }
 
@@ -184,6 +188,32 @@ export class ContentfulService {
     );
 
     return this.cmaClient.asset.processForAllLocales({}, asset);
+  }
+
+  private updateManagementEntryFields(
+    managementEntry: EntryProps<KeyValueMap>,
+    entryFields: Record<string, any>
+  ) {
+    for (let fieldName of ['title', 'description', 'image']) {
+      this.addManagementEntryField(
+        managementEntry,
+        fieldName,
+        entryFields[fieldName]
+      );
+    }
+  }
+
+  private async publishEntry(managementEntry: EntryProps<KeyValueMap>) {
+    managementEntry = await this.cmaClient.entry.publish(
+      { entryId: managementEntry.sys.id },
+      managementEntry
+    );
+
+    // Cascade publish for image asset
+    if (managementEntry.fields['image']) {
+      await this.publishAsset(managementEntry.fields['image']['en-US'].sys.id);
+    }
+    return managementEntry;
   }
 
   private addManagementEntryField(

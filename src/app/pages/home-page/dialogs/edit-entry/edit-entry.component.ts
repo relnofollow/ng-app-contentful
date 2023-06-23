@@ -1,6 +1,7 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AssetFile, Entry } from 'contentful';
 import { ContentfulService } from 'src/app/services/contentful/contentful.service';
 
@@ -14,16 +15,19 @@ export class EditEntryComponent {
     @Inject(MAT_DIALOG_DATA) public data: { entry: Entry },
     public dialogRef: MatDialogRef<EditEntryComponent>,
     public contentfulService: ContentfulService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private snackBar: MatSnackBar
   ) {}
 
   public entryForm = this.formBuilder.group({
-    title: this.data.entry.fields['title'],
-    description: this.data.entry.fields['description'],
-    image: this.data.entry.fields['image'],
+    title: [this.data.entry?.fields['title'], Validators.required],
+    description: this.data.entry?.fields['description'],
+    image: this.data.entry?.fields['image'],
   });
 
-  private imageField = <Entry>this.data.entry.fields['image'];
+  public title = this.data.entry ? 'Edit category' : 'Add new category';
+
+  private imageField = <Entry>this.data.entry?.fields['image'];
   private imageFile = <AssetFile>(<unknown>this.imageField?.fields?.['file']);
 
   public imageUrl: string | null = this.imageFile?.url;
@@ -54,15 +58,20 @@ export class EditEntryComponent {
         };
       }
 
-      await this.contentfulService.updateCategoryEntry(
-        this.data.entry.sys.id,
-        entryFields,
-        isPublish
-      );
+      if (this.data.entry) {
+        await this.contentfulService.updateCategoryEntry(
+          this.data.entry.sys.id,
+          entryFields,
+          isPublish
+        );
+      } else {
+        await this.contentfulService.addCategoryEntry(entryFields, isPublish);
+      }
 
       // TODO: update initial entry fields
       this.dialogRef.close(/*isUpdated=*/ true);
-    } catch {
+    } catch (e) {
+      this.snackBar.open(String(e), 'Dismiss');
       this.isLoading = false;
     }
   }

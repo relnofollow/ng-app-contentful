@@ -25,10 +25,11 @@
   >
 </div>
 <div>
-  <div *ngIf="(loading$ | async) || !entries; else entriesContainer">
-    <div class="flex h-72 w-full items-center justify-center">
-      <mat-spinner></mat-spinner>
-    </div>
+  <div
+    *ngIf="(loading$ | async) || !entries; else entriesContainer"
+    class="flex h-72 w-full items-center justify-center"
+  >
+    <mat-spinner></mat-spinner>
   </div>
   <ng-template #entriesContainer>
     <div *ngIf="entries!.length; else noEntries">

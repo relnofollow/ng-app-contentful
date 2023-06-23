@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
   ContentfulEntriesQuery,
@@ -8,14 +8,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   Observable,
   Subject,
-  combineLatest,
   debounceTime,
   distinctUntilChanged,
   first,
   from,
   map,
+  merge,
   shareReplay,
-  startWith,
   switchMap,
   tap,
 } from 'rxjs';
@@ -33,7 +32,7 @@ import { ViewEntryComponent } from '../../dialogs/view-entry/view-entry.componen
   templateUrl: './entries-list.component.html',
   styleUrls: ['./entries-list.component.scss'],
 })
-export class EntriesListComponent {
+export class EntriesListComponent implements OnInit {
   public entries: any[] | null = null;
 
   public INITIAL_SORT_DIRECTION = <SortDirection>'desc'; // const
@@ -43,9 +42,11 @@ export class EntriesListComponent {
 
   public loading$ = new Subject<boolean>();
   public contentTypes$!: Observable<ContentType[]>;
+  public sortDirection = this.INITIAL_SORT_DIRECTION;
+
   private pagingParameters$ = new Subject<PagingParameters>();
   private sortDirection$ = new Subject<SortDirection>();
-  public sortDirection = this.INITIAL_SORT_DIRECTION;
+  private isReloadEntries$ = new Subject<boolean>();
 
   public columnsToDisplay = [
     'contentType',
@@ -67,13 +68,14 @@ export class EntriesListComponent {
     private contentfulService: ContentfulService,
     private dialog: MatDialog
   ) {
-    combineLatest([
+    merge(
       this.getContentTypeObservable(),
       this.getTitleFilterObservable(),
       this.getPagingParametersObservable(),
       this.getSortDirectionObservable(),
       this.getIsDraftObservable(),
-    ])
+      this.getIsReloadEntriesObservable()
+    )
       .pipe(
         takeUntilDestroyed(),
         switchMap(() =>
@@ -95,6 +97,10 @@ export class EntriesListComponent {
       ),
       shareReplay(1)
     );
+  }
+
+  public ngOnInit(): void {
+    this.reloadEntries();
   }
 
   public onPaginatorChange(event: PageEvent): void {
@@ -121,13 +127,19 @@ export class EntriesListComponent {
   }
 
   public onEditEntryClick(entry: any): void {
-    this.dialog.open(EditEntryComponent, {
+    const dialogRef = this.dialog.open(EditEntryComponent, {
       autoFocus: false,
       height: '400px',
       width: '600px',
       data: {
         entry,
       },
+    });
+
+    dialogRef.afterClosed().subscribe((isEntryUpdated) => {
+      if (isEntryUpdated) {
+        this.reloadEntries();
+      }
     });
   }
 
@@ -141,7 +153,6 @@ export class EntriesListComponent {
 
   private getContentTypeObservable(): Observable<string | null> {
     return this.contentTypeControl.valueChanges.pipe(
-      startWith(null),
       distinctUntilChanged(),
       tap(() => this.resetPageIndex()),
       tap((value) => {
@@ -152,7 +163,6 @@ export class EntriesListComponent {
 
   private getTitleFilterObservable(): Observable<string> {
     return this.searchByTitleControl.valueChanges.pipe(
-      startWith(this.searchByTitleControl.value),
       debounceTime(500),
       distinctUntilChanged(),
       tap(() => this.resetPageIndex())
@@ -160,26 +170,25 @@ export class EntriesListComponent {
   }
 
   private getPagingParametersObservable(): Observable<PagingParameters> {
-    return this.pagingParameters$.pipe(
-      startWith({
-        pageIndex: this.pageIndex,
-        pageSize: this.pageSize,
-      })
-    );
+    return this.pagingParameters$.asObservable();
   }
 
   private getSortDirectionObservable(): Observable<SortDirection> {
-    return this.sortDirection$.pipe(
-      startWith(this.INITIAL_SORT_DIRECTION),
-      tap(() => this.resetPageIndex())
-    );
+    return this.sortDirection$.pipe(tap(() => this.resetPageIndex()));
   }
 
   private getIsDraftObservable(): Observable<boolean> {
     return this.showDraftControl.valueChanges.pipe(
-      startWith(this.showDraftControl.value),
       tap(() => this.resetPageIndex())
     );
+  }
+
+  private getIsReloadEntriesObservable(): Observable<boolean> {
+    return this.isReloadEntries$.asObservable();
+  }
+
+  private reloadEntries(): void {
+    this.isReloadEntries$.next(true);
   }
 
   private getQueryParameters(): ContentfulEntriesQuery {

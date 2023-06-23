@@ -1,4 +1,4 @@
-<app-dialog title="Edit entry" [formGroup]="entryForm">
+<app-dialog title="Edit entry" [formGroup]="entryForm" [showLoader]="isLoading">
   <mat-form-field class="w-full">
     <mat-label>Title</mat-label>
     <input matInput formControlName="title" />

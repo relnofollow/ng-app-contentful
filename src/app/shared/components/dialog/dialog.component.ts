@@ -9,4 +9,5 @@ export class DialogComponent {
   @ContentChild('dialogFooter') dialogFooter: TemplateRef<unknown> | undefined;
 
   @Input() title: string | undefined;
+  @Input() showLoader = false;
 }

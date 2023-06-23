@@ -1,4 +1,11 @@
-<div class="flex h-full flex-col">
+<div class="relative flex h-full flex-col">
+  <div
+    *ngIf="showLoader"
+    class="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-60"
+  >
+    <mat-spinner></mat-spinner>
+  </div>
+
   <!-- Title -->
   <div mat-dialog-title class="!pr-[9px]">
     <div class="inline-flex w-full items-center justify-between">

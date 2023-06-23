@@ -24,41 +24,47 @@ export class EditEntryComponent {
   });
 
   private imageField = <Entry>this.data.entry.fields['image'];
-  private imageFile = <AssetFile>(<unknown>this.imageField?.fields['file']);
+  private imageFile = <AssetFile>(<unknown>this.imageField?.fields?.['file']);
 
   public imageUrl: string | null = this.imageFile?.url;
   public uploadImageFile: File | null = null;
+  public isLoading = false;
 
   public async onSaveEntryClick(isPublish: boolean): Promise<void> {
     // TODO: remove hard-coded method name of contentfulService and field names
+    const entryFields: Record<string, any> = {};
 
-    this.data.entry.fields['title'] = this.entryForm.get('title')!.value;
-    this.data.entry.fields['description'] =
-      this.entryForm.get('description')!.value;
+    entryFields['title'] = this.entryForm.get('title')!.value;
+    entryFields['description'] = this.entryForm.get('description')!.value;
 
-    if (this.uploadImageFile) {
-      const asset = await this.contentfulService.createAsset(
-        this.uploadImageFile
+    try {
+      this.isLoading = true;
+
+      if (this.uploadImageFile) {
+        const asset = await this.contentfulService.createAsset(
+          this.uploadImageFile
+        );
+
+        entryFields['image'] = {
+          sys: {
+            id: asset.sys.id,
+            type: 'Link',
+            linkType: 'Asset',
+          },
+        };
+      }
+
+      await this.contentfulService.updateCategoryEntry(
+        this.data.entry.sys.id,
+        entryFields,
+        isPublish
       );
 
-      // TODO: properly update image
-      // mind the case when image is not modified during editing
-
-      // this.data.entry.fields['image'] = {
-      //   sys: {
-      //     id: asset.sys.id,
-      //     type: 'Link',
-      //     linkType: 'Asset',
-      //   },
-      // };
+      // TODO: update initial entry fields
+      this.dialogRef.close(/*isUpdated=*/ true);
+    } catch {
+      this.isLoading = false;
     }
-
-    await this.contentfulService.updateCategoryEntry(
-      this.data.entry.sys.id,
-      this.data.entry.fields,
-      isPublish
-    );
-    this.dialogRef.close();
   }
 
   public onFileSelected(event: Event): void {

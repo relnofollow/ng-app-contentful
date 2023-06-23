@@ -9,6 +9,8 @@ import {
 } from 'contentful';
 import {
   AssetProps,
+  EntryProps,
+  KeyValueMap,
   createClient as createManagementClient,
 } from 'contentful-management';
 import { PagingParameters } from 'src/app/models/PagingParameters';
@@ -119,11 +121,13 @@ export class ContentfulService {
   ) {
     let managementEntry = await this.cmaClient.entry.get({ entryId });
 
-    managementEntry.fields['title']['en-US'] = entryFields['title'];
-    managementEntry.fields['description']['en-US'] = entryFields['description'];
-
-    // TODO: update image wisely
-    // managementEntry.fields['image']['en-US'] = entryFields['image'];
+    for (let fieldName of ['title', 'description', 'image']) {
+      this.addManagementEntryField(
+        managementEntry,
+        fieldName,
+        entryFields[fieldName]
+      );
+    }
 
     managementEntry = await this.cmaClient.entry.update(
       {
@@ -133,7 +137,17 @@ export class ContentfulService {
     );
 
     if (isPublish) {
-      await this.cmaClient.entry.publish({ entryId }, managementEntry);
+      managementEntry = await this.cmaClient.entry.publish(
+        { entryId },
+        managementEntry
+      );
+
+      // Cascade publish for image asset
+      if (managementEntry.fields['image']) {
+        await this.publishAsset(
+          managementEntry.fields['image']['en-US'].sys.id
+        );
+      }
     }
   }
 
@@ -170,6 +184,33 @@ export class ContentfulService {
     );
 
     return this.cmaClient.asset.processForAllLocales({}, asset);
+  }
+
+  private addManagementEntryField(
+    managementEntry: EntryProps<KeyValueMap>,
+    fieldName: string,
+    fieldValue: any,
+    locale = 'en-US'
+  ): void {
+    if (fieldValue === undefined) {
+      return;
+    }
+
+    if (!managementEntry.fields[fieldName]) {
+      managementEntry.fields[fieldName] = { [locale]: null };
+    }
+
+    managementEntry.fields[fieldName][locale] = fieldValue;
+  }
+
+  private async publishAsset(assetId: string): Promise<void> {
+    const asset = await this.cmaClient.asset.get({ assetId });
+    await this.cmaClient.asset.publish(
+      {
+        assetId,
+      },
+      asset
+    );
   }
 
   private readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {

@@ -1,6 +1,26 @@
-# ContentfulProductCatalogAngular
+# Ng App Contentful
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.5.
+This is a sample Angular app to exercise integration with [Contentful CRM](https://www.contentful.com/).
+
+App is using Angular Material design under the hood and implements following functionality:
+- Fetch all content types using Content Delivery API
+- Fetch info for a single content type and display JSON data
+- Fetch entries using Content Delivery API / Content Preview API
+- Search entries by "Title" using pagination and ordering
+- Fetch a single entry
+- Only for 'Category' content type:
+    - Update entry, create an image asset for the entry, if necessary
+    - Create entry, create an immage asset for the entry, if nesessray
+    - Publish entry
+
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.5.  
+
+## Setup
+
+1. Create a demo space in Contentful CRM
+2. Setup the space by cloning repo from [https://github.com/contentful/ls-jumpstart-shop](https://github.com/contentful/ls-jumpstart-shop) and executing `npm run setup` with API keys for your demo space.<br/>**Be careful**: this script will overwrite (= destroy) all the data in the demo space.
+4. Run `npm install` for this project
+3. Fill in configuration options in `src/environments/environment.ts` file
 
 ## Development server
 

@@ -14,15 +14,7 @@ import {
   createClient as createManagementClient,
 } from 'contentful-management';
 import { PagingParameters } from 'src/app/models/PagingParameters';
-
-const CONFIG = {
-  space: '',
-  environment: '',
-  accessToken: '',
-  previewAccessToken: '',
-  personalAccessToken: '',
-  previewHost: '',
-};
+import { environment } from 'src/environments/environment';
 
 export type ContentfulEntriesQuery = {
   isDraft: boolean;
@@ -32,30 +24,32 @@ export type ContentfulEntriesQuery = {
   order: SortDirection;
 };
 
+const DEFAULT_LOCALE = 'en-US';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ContentfulService {
   private cdaClient = createClient({
-    space: CONFIG.space,
-    accessToken: CONFIG.accessToken,
+    space: environment.contentful.space,
+    accessToken: environment.contentful.accessToken,
   });
 
   private cpaClient = createClient({
-    space: CONFIG.space,
-    accessToken: CONFIG.previewAccessToken,
-    host: CONFIG.previewHost,
+    space: environment.contentful.space,
+    accessToken: environment.contentful.previewAccessToken,
+    host: environment.contentful.previewHost,
   });
 
   private cmaClient = createManagementClient(
     {
-      accessToken: CONFIG.personalAccessToken,
+      accessToken: environment.contentful.personalAccessToken,
     },
     {
       type: 'plain',
       defaults: {
-        spaceId: CONFIG.space,
-        environmentId: CONFIG.environment,
+        spaceId: environment.contentful.space,
+        environmentId: environment.contentful.environment,
       },
     }
   );
@@ -168,10 +162,10 @@ export class ContentfulService {
       {
         fields: {
           title: {
-            'en-US': file.name,
+            [DEFAULT_LOCALE]: file.name,
           },
           file: {
-            'en-US': {
+            [DEFAULT_LOCALE]: {
               contentType: file.type,
               fileName: file.name,
               uploadFrom: {
@@ -211,7 +205,9 @@ export class ContentfulService {
 
     // Cascade publish for image asset
     if (managementEntry.fields['image']) {
-      await this.publishAsset(managementEntry.fields['image']['en-US'].sys.id);
+      await this.publishAsset(
+        managementEntry.fields['image'][DEFAULT_LOCALE].sys.id
+      );
     }
     return managementEntry;
   }
@@ -220,7 +216,7 @@ export class ContentfulService {
     managementEntry: EntryProps<KeyValueMap>,
     fieldName: string,
     fieldValue: any,
-    locale = 'en-US'
+    locale = DEFAULT_LOCALE
   ): void {
     if (fieldValue === undefined) {
       return;

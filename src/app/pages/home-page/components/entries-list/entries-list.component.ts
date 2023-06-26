@@ -6,6 +6,7 @@ import {
 } from 'src/app/services/contentful/contentful.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
+  BehaviorSubject,
   Observable,
   Subject,
   debounceTime,
@@ -40,7 +41,7 @@ export class EntriesListComponent implements OnInit {
   public pageSize = 5;
   public pageIndex = 0;
 
-  public loading$ = new Subject<boolean>();
+  public loading$ = new BehaviorSubject<boolean>(false);
   public contentTypes$!: Observable<ContentType[]>;
   public sortDirection = this.INITIAL_SORT_DIRECTION;
 

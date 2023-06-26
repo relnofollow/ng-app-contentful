@@ -260,7 +260,7 @@ export class ContentfulService {
     });
   }
 
-  private getClient(isCPA: boolean): ContentfulClientApi<undefined> {
-    return isCPA ? this.cpaClient : this.cdaClient;
+  private getClient(isShowDraft: boolean): ContentfulClientApi<undefined> {
+    return isShowDraft ? this.cpaClient : this.cdaClient;
   }
 }

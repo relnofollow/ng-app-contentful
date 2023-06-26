@@ -3,6 +3,8 @@ import { ContentfulService } from 'src/app/services/contentful/contentful.servic
 import { ContentType } from 'contentful';
 import { MatDialog } from '@angular/material/dialog';
 import { ContentTypeJsonComponent } from '../../dialogs/content-type-json/content-type-json.component';
+import { BehaviorSubject, first, from } from 'rxjs';
+import { indicate } from 'src/app/helpers/rxjs';
 
 @Component({
   selector: 'app-content-types-list',
@@ -10,18 +12,21 @@ import { ContentTypeJsonComponent } from '../../dialogs/content-type-json/conten
   styleUrls: ['./content-types-list.component.scss'],
 })
 export class ContentTypesListComponent implements OnInit {
-  public contentTypes: ContentType[] = [];
+  public contentTypes: ContentType[] | null = [];
   public columnsToDisplay = ['name', 'fields', 'json'];
+  public loading$ = new BehaviorSubject<boolean>(false);
 
   constructor(
     private contentfulService: ContentfulService,
     private dialog: MatDialog
   ) {}
 
-  public async ngOnInit() {
-    const contentTypesCollection =
-      await this.contentfulService.getContentTypes();
-    this.contentTypes = contentTypesCollection.items;
+  public ngOnInit(): void {
+    from(this.contentfulService.getContentTypes())
+      .pipe(indicate(this.loading$), first())
+      .subscribe((contentTypesCollection) => {
+        this.contentTypes = contentTypesCollection.items;
+      });
   }
 
   public openContentTypeJsonDialog(contentType: ContentType): void {

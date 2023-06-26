@@ -1,31 +1,39 @@
-<table mat-table [dataSource]="contentTypes">
-  <!-- Name column -->
-  <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let contentType">{{ contentType.name }}</td>
-  </ng-container>
+<div
+  *ngIf="(loading$ | async) || !contentTypes; else contentTypesContainer"
+  class="flex h-72 w-full items-center justify-center"
+>
+  <mat-spinner></mat-spinner>
+</div>
+<ng-template #contentTypesContainer>
+  <table mat-table [dataSource]="contentTypes!">
+    <!-- Name column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let contentType">{{ contentType.name }}</td>
+    </ng-container>
 
-  <!-- Fields column -->
-  <ng-container matColumnDef="fields">
-    <th mat-header-cell *matHeaderCellDef>Fields</th>
-    <td mat-cell *matCellDef="let contentType">
-      {{ contentType.fields.length }}
-    </td>
-  </ng-container>
+    <!-- Fields column -->
+    <ng-container matColumnDef="fields">
+      <th mat-header-cell *matHeaderCellDef>Fields</th>
+      <td mat-cell *matCellDef="let contentType">
+        {{ contentType.fields.length }}
+      </td>
+    </ng-container>
 
-  <!-- JSON column -->
-  <ng-container matColumnDef="json">
-    <th mat-header-cell *matHeaderCellDef>JSON</th>
-    <td mat-cell *matCellDef="let contentType">
-      <button
-        mat-raised-button
-        (click)="openContentTypeJsonDialog(contentType)"
-      >
-        {{ "{ }" }}
-      </button>
-    </td>
-  </ng-container>
+    <!-- JSON column -->
+    <ng-container matColumnDef="json">
+      <th mat-header-cell *matHeaderCellDef>JSON</th>
+      <td mat-cell *matCellDef="let contentType">
+        <button
+          mat-raised-button
+          (click)="openContentTypeJsonDialog(contentType)"
+        >
+          {{ "{ }" }}
+        </button>
+      </td>
+    </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-  <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
-</table>
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let myRowData; columns: columnsToDisplay"></tr>
+  </table>
+</ng-template>

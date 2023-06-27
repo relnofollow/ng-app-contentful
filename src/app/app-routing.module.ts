@@ -17,6 +17,10 @@ const routes: Routes = [
         path: 'entries',
         component: EntriesListComponent,
       },
+      {
+        path: '**',
+        redirectTo: 'content-types',
+      },
     ],
   },
   {
